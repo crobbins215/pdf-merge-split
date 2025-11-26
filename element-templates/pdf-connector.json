@@ -1,0 +1,493 @@
+{
+  "$schema" : "https://unpkg.com/@camunda/zeebe-element-templates-json-schema/resources/schema.json",
+  "name" : "PDF Merge & Split Connector",
+  "id" : "io.camunda.connector.PdfMergeSplit.v1",
+  "description" : "Split and merge PDF documents with support for pages, ranges, bookmarks, and size-based operations",
+  "metadata" : {
+    "keywords" : [ ]
+  },
+  "documentationRef" : "https://github.com/crobbins215/pdf-merge-split/blob/main/README.md",
+  "version" : 1,
+  "category" : {
+    "id" : "connectors",
+    "name" : "Connectors"
+  },
+  "appliesTo" : [ "bpmn:Task" ],
+  "elementType" : {
+    "value" : "bpmn:ServiceTask"
+  },
+  "groups" : [ {
+    "id" : "operation",
+    "label" : "Operation"
+  }, {
+    "id" : "connector",
+    "label" : "Connector"
+  }, {
+    "id" : "output",
+    "label" : "Output mapping"
+  }, {
+    "id" : "error",
+    "label" : "Error handling"
+  }, {
+    "id" : "retries",
+    "label" : "Retries"
+  } ],
+  "properties" : [ {
+    "value" : "io.camunda:pdf-connector:1",
+    "binding" : {
+      "property" : "type",
+      "type" : "zeebe:taskDefinition"
+    },
+    "type" : "Hidden"
+  }, {
+    "id" : "operation",
+    "label" : "Operation",
+    "description" : "The operation to execute",
+    "value" : "mergePdfs",
+    "group" : "operation",
+    "binding" : {
+      "key" : "operation",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "Dropdown",
+    "choices" : [ {
+      "name" : "Merge PDFs",
+      "value" : "mergePdfs"
+    }, {
+      "name" : "Split by Bookmark",
+      "value" : "splitByBookmark"
+    }, {
+      "name" : "Split by Page",
+      "value" : "splitByPage"
+    }, {
+      "name" : "Split by Range",
+      "value" : "splitByRange"
+    }, {
+      "name" : "Split by Size",
+      "value" : "splitBySize"
+    } ]
+  }, {
+    "id" : "mergePdfs:merge-documents",
+    "label" : "PDF Documents",
+    "description" : "List of PDF documents to merge (in order)",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "required",
+    "group" : "operation",
+    "binding" : {
+      "name" : "documents",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "mergePdfs",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "mergePdfs:merge-outputFilename",
+    "label" : "Output Filename",
+    "description" : "Name for the merged PDF file (e.g., 'merged-output.pdf')",
+    "optional" : false,
+    "value" : "merged.pdf",
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "outputFilename",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "mergePdfs",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "mergePdfs:merge-preserveBookmarks",
+    "label" : "Preserve Bookmarks",
+    "description" : "Retain bookmarks from source PDFs with filename prefixes",
+    "optional" : false,
+    "feel" : "static",
+    "group" : "operation",
+    "binding" : {
+      "name" : "preserveBookmarks",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "mergePdfs",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "Boolean"
+  }, {
+    "id" : "mergePdfs:merge-pageSizeStandardization",
+    "label" : "Page Size Standardization",
+    "description" : "How to handle different page sizes: KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, or A4",
+    "optional" : false,
+    "value" : "USE_LARGEST",
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "pageSizeStandardization",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "mergePdfs",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByBookmark:splitByBookmark-document",
+    "label" : "PDF Document",
+    "description" : "The PDF document to split by bookmarks",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "required",
+    "group" : "operation",
+    "binding" : {
+      "name" : "document",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByBookmark",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByBookmark:splitByBookmark-topLevelOnly",
+    "label" : "Top-Level Only",
+    "description" : "Split only by top-level bookmarks (ignore nested bookmarks)",
+    "optional" : false,
+    "feel" : "static",
+    "group" : "operation",
+    "binding" : {
+      "name" : "topLevelOnly",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByBookmark",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "Boolean"
+  }, {
+    "id" : "splitByBookmark:splitByBookmark-outputPattern",
+    "label" : "Output Filename Pattern",
+    "description" : "Pattern for output filenames. Use {bookmark} for bookmark title, {index} for number",
+    "optional" : false,
+    "value" : "{bookmark}.pdf",
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "outputPattern",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByBookmark",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByPage:splitByPage-document",
+    "label" : "PDF Document",
+    "description" : "The PDF document to split",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "required",
+    "group" : "operation",
+    "binding" : {
+      "name" : "document",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByPage",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByPage:splitByPage-pagesPerFile",
+    "label" : "Pages per File",
+    "description" : "Number of pages per output file (1 = one page per file)",
+    "optional" : false,
+    "feel" : "static",
+    "group" : "operation",
+    "binding" : {
+      "name" : "pagesPerFile",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByPage",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "Number"
+  }, {
+    "id" : "splitByPage:splitByPage-outputPattern",
+    "label" : "Output Filename Pattern",
+    "description" : "Pattern for output filenames. Use {index} for file number (e.g., 'page-{index}.pdf')",
+    "optional" : false,
+    "value" : "split-{index}.pdf",
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "outputPattern",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByPage",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByRange:splitByRange-document",
+    "label" : "PDF Document",
+    "description" : "The PDF document to split",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "required",
+    "group" : "operation",
+    "binding" : {
+      "name" : "document",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByRange",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByRange:splitByRange-pageRanges",
+    "label" : "Page Ranges",
+    "description" : "Comma-separated page ranges (e.g., '1-3,5-7,10-15'). Pages are 1-indexed.",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "pageRanges",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByRange",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitByRange:splitByRange-outputPattern",
+    "label" : "Output Filename Pattern",
+    "description" : "Pattern for output filenames. Use {index} for file number",
+    "optional" : false,
+    "value" : "range-{index}.pdf",
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "outputPattern",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitByRange",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitBySize:splitBySize-document",
+    "label" : "PDF Document",
+    "description" : "The PDF document to split by size",
+    "optional" : false,
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "required",
+    "group" : "operation",
+    "binding" : {
+      "name" : "document",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitBySize",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "splitBySize:splitBySize-maxFileSizeMb",
+    "label" : "Max File Size (MB)",
+    "description" : "Target maximum file size in megabytes. Will split when size is approached.",
+    "optional" : false,
+    "feel" : "static",
+    "group" : "operation",
+    "binding" : {
+      "name" : "maxFileSizeMb",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitBySize",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "Number"
+  }, {
+    "id" : "splitBySize:splitBySize-outputPattern",
+    "label" : "Output Filename Pattern",
+    "description" : "Pattern for output filenames. Use {index} for file number",
+    "optional" : false,
+    "value" : "part-{index}.pdf",
+    "constraints" : {
+      "notEmpty" : true
+    },
+    "feel" : "optional",
+    "group" : "operation",
+    "binding" : {
+      "name" : "outputPattern",
+      "type" : "zeebe:input"
+    },
+    "condition" : {
+      "allMatch" : [ {
+        "property" : "operation",
+        "equals" : "splitBySize",
+        "type" : "simple"
+      } ]
+    },
+    "type" : "String"
+  }, {
+    "id" : "version",
+    "label" : "Version",
+    "description" : "Version of the element template",
+    "value" : "1",
+    "group" : "connector",
+    "binding" : {
+      "key" : "elementTemplateVersion",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "Hidden"
+  }, {
+    "id" : "id",
+    "label" : "ID",
+    "description" : "ID of the element template",
+    "value" : "io.camunda.connector.PdfMergeSplit.v1",
+    "group" : "connector",
+    "binding" : {
+      "key" : "elementTemplateId",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "Hidden"
+  }, {
+    "id" : "resultVariable",
+    "label" : "Result variable",
+    "description" : "Name of variable to store the response in",
+    "group" : "output",
+    "binding" : {
+      "key" : "resultVariable",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "String"
+  }, {
+    "id" : "resultExpression",
+    "label" : "Result expression",
+    "description" : "Expression to map the response into process variables",
+    "feel" : "required",
+    "group" : "output",
+    "binding" : {
+      "key" : "resultExpression",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "Text"
+  }, {
+    "id" : "errorExpression",
+    "label" : "Error expression",
+    "description" : "Expression to handle errors. Details in the <a href=\"https://docs.camunda.io/docs/components/connectors/use-connectors/\" target=\"_blank\">documentation</a>.",
+    "feel" : "required",
+    "group" : "error",
+    "binding" : {
+      "key" : "errorExpression",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "Text"
+  }, {
+    "id" : "retryCount",
+    "label" : "Retries",
+    "description" : "Number of retries",
+    "value" : "3",
+    "feel" : "optional",
+    "group" : "retries",
+    "binding" : {
+      "property" : "retries",
+      "type" : "zeebe:taskDefinition"
+    },
+    "type" : "String"
+  }, {
+    "id" : "retryBackoff",
+    "label" : "Retry backoff",
+    "description" : "ISO-8601 duration to wait between retries",
+    "value" : "PT0S",
+    "group" : "retries",
+    "binding" : {
+      "key" : "retryBackoff",
+      "type" : "zeebe:taskHeader"
+    },
+    "type" : "String"
+  } ],
+  "icon" : {
+    "contents" : "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij4NCiAgPGRlZnM+DQogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwZGZHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4NCiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRjU3MzM7c3RvcC1vcGFjaXR5OjEiIC8+DQogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNzAwMzk7c3RvcC1vcGFjaXR5OjEiIC8+DQogICAgPC9saW5lYXJHcmFkaWVudD4NCiAgPC9kZWZzPg0KICA8cmVjdCB4PSI0IiB5PSIyIiB3aWR0aD0iMTYiIGhlaWdodD0iMjAiIHJ4PSIxIiBmaWxsPSJ1cmwoI3BkZkdyYWQpIi8+DQogIDxwYXRoIGQ9Ik0xNiAyIEwyMCA2IEwxNiA2IFoiIGZpbGw9IiM5MDAwMjAiLz4NCiAgPHRleHQgeD0iMTIiIHk9IjEzIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QREY8L3RleHQ+DQogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLCAxNikiPg0KICAgIDxwYXRoIGQ9Ik0tMywtMSBMLTUsMCBMLTMsMSBaIiBmaWxsPSJ3aGl0ZSIvPg0KICAgIDxsaW5lIHgxPSItNSIgeTE9IjAiIHgyPSItMiIgeTI9IjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+DQogICAgPHBhdGggZD0iTTMsLTEgTDUsMCBMMywxIFoiIGZpbGw9IndoaXRlIi8+DQogICAgPGxpbmUgeDE9IjIiIHkxPSIwIiB4Mj0iNSIgeTI9IjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+DQogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz4NCiAgPC9nPg0KPC9zdmc+DQo="
+  }
+}

@@ -1,0 +1,16 @@
+# Application Properties Template for PDF Merge & Split Connector
+#
+# SECURITY NOTICE: Never commit credentials to version control!
+# Copy this file to application.properties and replace the placeholders with your actual values.
+#
+# Instructions:
+# 1. Copy: cp application.properties.template application.properties
+# 2. Replace <YOUR_*> placeholders with your Camunda SaaS credentials
+# 3. The application.properties file is in .gitignore and will not be committed
+
+# Camunda SaaS Configuration
+camunda.client.mode=saas
+camunda.client.auth.client-id=<YOUR_CLIENT_ID>
+camunda.client.auth.client-secret=<YOUR_CLIENT_SECRET>
+camunda.client.cloud.cluster-id=<YOUR_CLUSTER_ID>
+camunda.client.cloud.region=<YOUR_REGION>

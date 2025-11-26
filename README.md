@@ -1,46 +1,38 @@
-> A Connector template for new C8 outbound connector
->
-> To use this template update the following resources to match the name of your connector:
->
-> * [README](./README.md) (title, description)
-> * [Element Template](./element-templates/template-connector.json)
-> * [POM](./pom.xml) (artifact name, id, description)
-> * [Connector Function](src/main/java/io/camunda/example/classic/MyConnectorFunction.java) (rename, implement, update
-    `OutboundConnector` annotation)
-> * [Service Provider Interface (SPI)](./src/main/resources/META-INF/services/io.camunda.connector.api.outbound.OutboundConnectorFunction) (
-    rename)
->
->
-> about [creating Connectors](https://docs.camunda.io/docs/components/connectors/custom-built-connectors/connector-sdk/#creating-a-custom-connector)
->
-> Check out the [Connectors SDK](https://github.com/camunda/connectors)
+# PDF Merge & Split Connector
 
-# Connector Template
+A Camunda Outbound Connector for PDF document manipulation, providing split and merge operations for workflow automation.
 
-Camunda Outbound Connector Template
+## Overview
 
-This template project illustrates two different approaches to implement a Camunda Outbound Connector.
-Both implementations are supported by the Connector SDK and can be used as a foundation for building your own
-Connector. You can choose the approach that best fits your needs:
+This connector simplifies document management by allowing users to easily split and merge PDF files directly within their Camunda workflows. It provides an out-of-the-box solution that saves time, reduces manual errors, and enhances productivity in document processing scenarios.
 
-## Classic API - `OutboundConnectorFunction`
+### Value Proposition
 
-Example implementation: [`io.camunda.example.classic.MyConnectorFunction`](src/main/java/io/camunda/example/classic/MyConnectorFunction.java).
+In many IDP (Intelligent Document Processing) scenarios, users deal with scanned documents containing multiple forms or files within a single PDF. These documents need to be split by page to isolate individual forms or sections for accurate classification. Once classified, users need to merge the classified documents back together by type to create organized, easily accessible files. This connector automates these workflows, eliminating manual processing bottlenecks.
 
-This approach utilizes the traditional `OutboundConnectorFunction` interface from the Connector SDK.
+### Features
 
-## Operations API - `OutboundConnectorProvider`
+**Must Have:**
+- ✅ Split PDFs by page (individual pages or N pages per file)
+- ✅ Split PDFs by page ranges (e.g., "1-3,5-7,10-15")
+- ✅ Merge multiple PDF files into a single document
 
-Example implementation: [`io.camunda.example.operations.MyConnectorProvider`](src/main/java/io/camunda/example/operations/MyConnectorProvider.java).
+**Nice to Have:**
+- ✅ Split PDFs by bookmarks (top-level bookmarks only)
+- ✅ Split PDFs by file size (iteratively adds pages until size limit)
+- ✅ Bookmark preservation during merge (with document name prefixes)
+- ✅ Page size standardization during merge (KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, A4)
 
-Another example implementation from the main Connectors repository can be found [here](https://github.com/camunda/connectors/blob/23e577ead64c2a6b478b05d2ea3100ca6846e70a/connectors/csv/src/main/java/io/camunda/connector/csv/CsvConnector.java).
+## Implementation Details
 
-This approach leverages the newer Operations API by implementing the `OutboundConnectorProvider` interface.
-The benefit of this approach is that it allows you to define multiple operations within a single Connector
-without the need to explicitly handle the routing of operations within a connector yourself.
+This connector uses the **Operations API** approach with `OutboundConnectorProvider`, allowing multiple PDF operations within a single connector without manual routing.
 
-The element template generator tool also supports both approaches and will generate the appropriate
-element templates based on the implementation you choose.
+**Key Technologies:**
+- Apache PDFBox 3.0.3 for PDF manipulation
+- Camunda Connector SDK 8.8.2
+- Java 21
+
+**Operations Implementation:** [`io.camunda.example.operations.PdfConnectorProvider`](src/main/java/io/camunda/example/operations/PdfConnectorProvider.java)
 
 ## Build
 
@@ -77,29 +69,113 @@ provides more details on relocations.
 
 ## API
 
-### Input
+### Operations
 
-| Name     | Description      | Example           | Notes                                                                      |
-|----------|------------------|-------------------|----------------------------------------------------------------------------|
-| username | Mock username    | `alice`           | Has no effect on the function call outcome.                                |
-| token    | Mock token value | `my-secret-token` | Has no effect on the function call outcome.                                |
-| message  | Mock message     | `Hello World`     | Echoed back in the output. If starts with 'fail', an error will be thrown. |
+The PDF Merge & Split Connector provides five powerful operations for PDF document manipulation:
 
-### Output
+#### 1. Merge PDFs
+Combines multiple PDF files into a single document.
 
+**Input:**
+- `documents`: List of PDF documents to merge (in order)
+- `outputFilename`: Name for the merged PDF (default: "merged.pdf")
+- `preserveBookmarks`: Retain bookmarks from source PDFs with filename prefixes (default: true)
+- `pageSizeStandardization`: How to handle different page sizes
+  - `KEEP_ORIGINAL`: Maintain original page sizes
+  - `USE_LARGEST`: Standardize to the largest page size
+  - `USE_FIRST`: Use the first document's page size
+  - `A4`: Standardize all pages to A4
+
+**Output:**
 ```json
 {
-  "result":{
-    "myProperty":"Message received: ..."
-  }
+  "mergedDocument": "<Document>",
+  "totalPages": 50,
+  "sourceDocumentCount": 3,
+  "fileSizeBytes": 1048576
+}
+```
+
+#### 2. Split by Page
+Splits a PDF into multiple files based on pages per file.
+
+**Input:**
+- `document`: The PDF document to split
+- `pagesPerFile`: Number of pages per output file (1 = one page per file)
+- `outputPattern`: Pattern for output filenames (use `{index}` for file number, e.g., "page-{index}.pdf")
+
+**Output:**
+```json
+{
+  "splitDocuments": ["<Document>", "<Document>", "..."],
+  "totalFiles": 10,
+  "originalPages": 50,
+  "splitMethod": "BY_PAGE"
+}
+```
+
+#### 3. Split by Range
+Splits a PDF into multiple files based on specified page ranges.
+
+**Input:**
+- `document`: The PDF document to split
+- `pageRanges`: Comma-separated page ranges (e.g., "1-3,5-7,10-15"). Pages are 1-indexed.
+- `outputPattern`: Pattern for output filenames (use `{index}`, `{start}`, `{end}`)
+
+**Output:**
+```json
+{
+  "splitDocuments": ["<Document>", "<Document>", "..."],
+  "totalFiles": 3,
+  "originalPages": 50,
+  "splitMethod": "BY_RANGE"
+}
+```
+
+#### 4. Split by Bookmark
+Splits a PDF into separate files based on document bookmarks.
+
+**Input:**
+- `document`: The PDF document to split
+- `topLevelOnly`: Split only by top-level bookmarks, ignoring nested bookmarks (default: true)
+- `outputPattern`: Pattern for output filenames (use `{bookmark}` for bookmark title, `{index}` for number)
+
+**Output:**
+```json
+{
+  "splitDocuments": ["<Document>", "<Document>", "..."],
+  "totalFiles": 5,
+  "originalPages": 50,
+  "splitMethod": "BY_BOOKMARK"
+}
+```
+
+#### 5. Split by Size
+Splits a PDF into multiple files based on target file size. Pages are added iteratively until the size limit is approached.
+
+**Input:**
+- `document`: The PDF document to split
+- `maxFileSizeMb`: Target maximum file size in megabytes (1-100 MB)
+- `outputPattern`: Pattern for output filenames (use `{index}` for file number)
+
+**Output:**
+```json
+{
+  "splitDocuments": ["<Document>", "<Document>", "..."],
+  "totalFiles": 8,
+  "originalPages": 50,
+  "splitMethod": "BY_SIZE"
 }
 ```
 
 ### Error codes
 
-| Code | Description                                |
-|------|--------------------------------------------|
-| FAIL | Message starts with 'fail' (ignoring case) |
+| Code | Description |
+|------|-------------|
+| PDF_MERGE_ERROR | Failed to merge PDF documents |
+| PDF_SPLIT_ERROR | Failed to split PDF document |
+| NO_BOOKMARKS | PDF document does not contain bookmarks |
+| INVALID_PAGE_RANGE | Invalid page range specification |
 
 ## Test locally
 
@@ -146,50 +222,128 @@ Either comment out the connectors service, or use the `--scale` flag to exclude 
 docker compose -f docker-compose-core.yaml up --scale connectors=0
 ```
 
-#### Configure the Desktop Modeler and Use Your Connector
+#### Configure the Desktop Modeler
 
-Add the `element-templates/template-connector-message-start-event.json` to your Modeler configuration as per
+Add the `element-templates/pdf-connector.json` to your Modeler configuration as per
 the [Element Templates documentation](https://docs.camunda.io/docs/components/modeler/desktop-modeler/element-templates/configuring-templates/).
 
-#### Using Your Connector
-Then, to use your connector in a local Camunda environment, follow these steps:
+#### Run the Connector Locally
 
-1. Run `io.camunda.connector.inbound.LocalConnectorRuntime` to start your connector.
+1. Run `io.camunda.example.classic.LocalConnectorRuntime` to start your connector.
 2. Open the Camunda Desktop Modeler and create a new BPMN diagram.
-3. Design a process that incorporates your newly created connector.
+3. Design a process that incorporates the PDF connector.
 4. Deploy the process to your local Camunda platform.
 5. Verify that the process is running smoothly by accessing Camunda Operate at [localhost:8088/operate](http://localhost:8088/operate). Username and password are both `demo`.
+
+### Docker Deployment
+
+#### Prerequisites
+
+- Docker and Docker Compose installed
+- Camunda SaaS cluster with API credentials
+- Built connector JAR (`mvn clean package`)
+
+#### Setup
+
+1. **Create configuration file** from template:
+   ```bash
+   cp docker-compose.yml.template docker-compose.yml
+   ```
+
+2. **Update credentials** in `docker-compose.yml`:
+   ```yaml
+   environment:
+     CAMUNDA_CLIENT_AUTH_CLIENT_ID: <your-client-id>
+     CAMUNDA_CLIENT_AUTH_CLIENT_SECRET: <your-client-secret>
+     CAMUNDA_CLIENT_CLOUD_CLUSTER_ID: <your-cluster-id>
+     CAMUNDA_CLIENT_CLOUD_REGION: <your-region>
+     # ... additional Zeebe configuration
+   ```
+
+3. **Build and run** the connector:
+   ```bash
+   docker-compose up --build -d
+   ```
+
+4. **Monitor logs**:
+   ```bash
+   docker-compose logs -f pdf-connector
+   ```
+
+5. **Stop the connector**:
+   ```bash
+   docker-compose down
+   ```
+
+#### Troubleshooting
+
+- **Container fails with "Operation ID is missing"**: Ensure your BPMN service task has the element template applied with an operation selected
+- **Connection refused**: Verify Camunda SaaS credentials and cluster region
+- **Out of memory**: Large PDF processing may require increased Docker memory limits
 
 ### SaaS environment
 
 #### Creating an API Client
 
-The Connectors Runtime (LocalConnectorRuntime) requires connection details to interact with your Camunda SaaS cluster. To set this up, follow these steps:
+To connect the connector to your Camunda SaaS cluster, you'll need API credentials:
 
-1. Navigate to Camunda [SaaS](https://console.camunda.io).
-2. Create a cluster using the latest version available.
-3. Select your cluster, then go to the `API` section and click `Create new Client`.
-4. Ensure the `zeebe` checkbox is selected, then click `Create`.
-5. Copy the configuration details displayed under the `Spring Boot` tab.
-6. Paste the copied configuration into your `application.properties` file within your project.
+1. Navigate to [Camunda SaaS Console](https://console.camunda.io).
+2. Create a cluster using Camunda 8.8 or later.
+3. Select your cluster, go to the `API` tab, and click `Create new Client`.
+4. Ensure the `Zeebe` scope is selected, then click `Create`.
+5. Copy the generated credentials (Client ID, Client Secret, Cluster ID, Region).
 
-#### Using Your Connector
+#### Local Testing with SaaS
 
-1. Start your connector by executing `io.camunda.connector.inbound.LocalConnectorRuntime` in your development
-   environment.
-2. Access the Web Modeler and create a new project.
-3. Click on `Create new`, then select `Upload files`. Upload the connector template from the repository you have.
-4. After uploading, **publish the connector template** by clicking the Publish button.
-5. In the same folder, create a new BPMN diagram.
-6. Design and start a process that incorporates your new connector.
+1. **Create configuration file** from template:
+   ```bash
+   cp src/main/resources/application.properties.template src/main/resources/application.properties
+   ```
+
+2. **Update credentials** in `application.properties`:
+   ```properties
+   camunda.client.mode=saas
+   camunda.client.auth.client-id=<your-client-id>
+   camunda.client.auth.client-secret=<your-client-secret>
+   camunda.client.cloud.cluster-id=<your-cluster-id>
+   camunda.client.cloud.region=<your-region>
+   ```
+
+3. **Run the connector**:
+   ```bash
+   mvn spring-boot:run -Dspring-boot.run.main-class=io.camunda.example.classic.LocalConnectorRuntime
+   ```
+
+#### Using the Connector in Web Modeler
+
+1. Access [Camunda Web Modeler](https://modeler.camunda.io).
+2. Create a new project or open an existing one.
+3. Click `Create new` → `Upload files`, and upload `element-templates/pdf-connector.json`.
+4. **Publish the element template** by clicking the Publish button.
+5. Create a new BPMN diagram in the same folder.
+6. Add a Service Task and apply the "PDF Merge & Split Connector" template.
+7. Configure the desired operation and parameters.
+8. Deploy and start your process.
+
+**⚠️ Security Note:** Never commit `application.properties` or `docker-compose.yml` with credentials to version control. Use the provided `.template` files as a starting point.
 
 ## Element Template
 
-The element template for this sample connector is generated automatically based on the connector
+The element template for this connector is generated automatically based on the connector
 input class using
 the [Element Template Generator](https://github.com/camunda/connectors/tree/main/element-template-generator/core).
 
 The generation is embedded in the Maven build and can be triggered by running `mvn clean package`.
 
-The generated element template can be found
-in [element-templates/template-connector.json](./element-templates/template-connector.json).
+The generated element template can be found in [element-templates/pdf-connector.json](./element-templates/pdf-connector.json).
+
+## Release Notes
+
+**Version 0.1.0-SNAPSHOT**
+
+New Features:
+- ✅ Added support for splitting PDFs by page, range, or bookmark
+- ✅ Added support for splitting PDFs by file size
+- ✅ Added support for merging multiple PDF files into a single document
+- ✅ Bookmark preservation during merge with document name prefixes
+- ✅ Page size standardization options during merge (KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, A4)

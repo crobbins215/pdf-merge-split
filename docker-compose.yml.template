@@ -1,0 +1,35 @@
+# Docker Compose Template for PDF Merge & Split Connector
+# 
+# SECURITY NOTICE: Never commit credentials to version control!
+# Copy this file to docker-compose.yml and replace the placeholders with your actual values.
+#
+# Instructions:
+# 1. Copy: cp docker-compose.yml.template docker-compose.yml
+# 2. Replace <YOUR_*> placeholders with your Camunda SaaS credentials
+# 3. The docker-compose.yml file is in .gitignore and will not be committed
+
+version: '3.8'
+
+services:
+  pdf-connector:
+    build: .
+    environment:
+      # Camunda Client Configuration
+      CAMUNDA_CLIENT_MODE: saas
+      CAMUNDA_CLIENT_AUTH_CLIENT_ID: <YOUR_CLIENT_ID>
+      CAMUNDA_CLIENT_AUTH_CLIENT_SECRET: <YOUR_CLIENT_SECRET>
+      CAMUNDA_CLIENT_CLOUD_CLUSTER_ID: <YOUR_CLUSTER_ID>
+      CAMUNDA_CLIENT_CLOUD_REGION: <YOUR_REGION>
+      
+      # Zeebe Client Configuration
+      ZEEBE_CLIENT_CLOUD_CLUSTER_ID: <YOUR_CLUSTER_ID>
+      ZEEBE_CLIENT_CLOUD_CLIENT_ID: <YOUR_CLIENT_ID>
+      ZEEBE_CLIENT_CLOUD_CLIENT_SECRET: <YOUR_CLIENT_SECRET>
+      ZEEBE_CLIENT_CLOUD_REGION: <YOUR_REGION>
+    restart: unless-stopped
+    # Uncomment to add resource limits
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 512M

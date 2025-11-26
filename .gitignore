@@ -59,6 +59,20 @@ build/
 ### VS Code ###
 .vscode/
 
+# Maven build artifacts
+dependency-reduced-pom.xml
+
+# Environment and secrets - NEVER commit credentials
+*.env
+.env
+.env.*
+application.properties
+application-*.properties
+docker-compose.yml
+
+# OS specific
+Thumbs.db
+
 # environment
 .env
 request*.json
