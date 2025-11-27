@@ -1,4 +1,11 @@
-## Full-history secret scan
+## Security & Compliance
+
+- Secret scanning: Gitleaks runs on every push/PR via `.github/workflows/gitleaks.yml` using `.gitleaks.toml`.
+- One-off history scan: trigger `Secret Scan (Full History)` from Actions to scan entire Git history.
+- Dependencies: Dependabot alerts are monitored; see the Security tab for current status.
+- Reporting: Please follow the guidance in [`SECURITY.md`](SECURITY.md) and use GitHub private reporting for vulnerabilities.
+
+### Run full-history secret scan
 
 Run a one-off scan of the entire Git history to check for past secrets:
 
@@ -34,7 +41,7 @@ This connector uses the **Operations API** approach with `OutboundConnectorProvi
 
 **Key Technologies:**
 - Apache PDFBox 3.0.3 for PDF manipulation
-- Camunda Connector SDK 8.8.2
+- Camunda Connector SDK 8.8.3
 - Java 21
 
 **Operations Implementation:** [`io.camunda.example.operations.PdfConnectorProvider`](src/main/java/io/camunda/example/operations/PdfConnectorProvider.java)
