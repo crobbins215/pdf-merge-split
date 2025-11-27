@@ -10,26 +10,6 @@ If you discover a security vulnerability in this connector, please report it by:
 
 ## Known Security Incidents
 
-### Credential Exposure (November 2025)
-
-**Incident:** Camunda SaaS API credentials were accidentally committed to version control in the following files:
-- `docker-compose.yml`
-- `src/main/resources/application.properties`
-
-**Impact:** Test cluster credentials were exposed publicly in the Git history.
-
-**Resolution:**
-- Test cluster credentials were rotated immediately
-- Files added to `.gitignore` to prevent future commits
-- Template files created (`*.template`) for safe credential management
-- Repository cleaned and documentation updated
-
-**Lessons Learned:**
-- Never commit credentials to version control
-- Use environment variables or secrets management systems
-- Implement pre-commit hooks to detect credentials
-- Regular security audits of configuration files
-
 ## Best Practices for Credentials Management
 
 ### Using This Connector

@@ -432,10 +432,10 @@ The generated element template can be found in [element-templates/pdf-connector.
 **Version 1.3.1**
 
 Changes:
-- CI hardening: fixed Gitleaks workflow inputs, corrected `.gitleaks.toml` quoting
-- Coverage: upload JaCoCo HTML report; enforcement moved to optional profile (`-Pcoverage-enforced`)
-- Docker: base image aligned to `camunda/connectors:8.8.3`
-- Docs: README polishing and workflow cleanup
+- ✅ **CI hardening** - Fixed Gitleaks workflow inputs, corrected `.gitleaks.toml` quoting
+- ✅ **Coverage** - Upload JaCoCo HTML report; enforcement moved to optional profile (`-Pcoverage-enforced`)
+- ✅ **Docker** - base image aligned to `camunda/connectors:8.8.3`
+- ✅ **Docs** - README polishing and workflow cleanup
 
 **Version 1.3.0**
 
