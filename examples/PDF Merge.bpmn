@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="328abc1" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="Process_08wy8uu" name="PDF Merge" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1xkwj18</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_1pbbxny" name="PDF Upload">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="Form_1ndaxvv" />
+        <zeebe:ioMapping>
+          <zeebe:output source="=pdf" target="pdf" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1xkwj18</bpmn:incoming>
+      <bpmn:outgoing>Flow_055maaz</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_055maaz" sourceRef="Activity_1pbbxny" targetRef="Activity_0fmzi5o" />
+    <bpmn:serviceTask id="Activity_0fmzi5o" name="PDF Merge" zeebe:modelerTemplate="io.camunda.connector.PdfMergeSplit.v1" zeebe:modelerTemplateVersion="3" zeebe:modelerTemplateIcon="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4Ij4NCiAgPGRlZnM+DQogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwZGZHcmFkIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj4NCiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNGRjU3MzM7c3RvcC1vcGFjaXR5OjEiIC8+DQogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNzAwMzk7c3RvcC1vcGFjaXR5OjEiIC8+DQogICAgPC9saW5lYXJHcmFkaWVudD4NCiAgPC9kZWZzPg0KICA8cmVjdCB4PSI0IiB5PSIyIiB3aWR0aD0iMTYiIGhlaWdodD0iMjAiIHJ4PSIxIiBmaWxsPSJ1cmwoI3BkZkdyYWQpIi8+DQogIDxwYXRoIGQ9Ik0xNiAyIEwyMCA2IEwxNiA2IFoiIGZpbGw9IiM5MDAwMjAiLz4NCiAgPHRleHQgeD0iMTIiIHk9IjEzIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNSIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5QREY8L3RleHQ+DQogIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyLCAxNikiPg0KICAgIDxwYXRoIGQ9Ik0tMywtMSBMLTUsMCBMLTMsMSBaIiBmaWxsPSJ3aGl0ZSIvPg0KICAgIDxsaW5lIHgxPSItNSIgeTE9IjAiIHgyPSItMiIgeTI9IjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+DQogICAgPHBhdGggZD0iTTMsLTEgTDUsMCBMMywxIFoiIGZpbGw9IndoaXRlIi8+DQogICAgPGxpbmUgeDE9IjIiIHkxPSIwIiB4Mj0iNSIgeTI9IjAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41Ii8+DQogICAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjEuNSIgZmlsbD0id2hpdGUiLz4NCiAgPC9nPg0KPC9zdmc+DQo=">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:pdf-connector:1" retries="3" />
+        <zeebe:taskHeaders>
+          <zeebe:header key="operation" value="mergePdfs" />
+          <zeebe:header key="elementTemplateVersion" value="1" />
+          <zeebe:header key="elementTemplateId" value="io.camunda.connector.PdfMergeSplit.v1" />
+          <zeebe:header key="resultVariable" value="pdfResult" />
+          <zeebe:header key="resultExpression" value="=pdfResult" />
+          <zeebe:header key="retryBackoff" value="PT0S" />
+        </zeebe:taskHeaders>
+        <zeebe:ioMapping>
+          <zeebe:input source="=pdf" target="documents" />
+          <zeebe:input source="merged.pdf" target="outputFilename" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_055maaz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1mohb97</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1mohb97" sourceRef="Activity_0fmzi5o" targetRef="Activity_01tbwr5" />
+    <bpmn:userTask id="Activity_01tbwr5" name="PDF Merge Viewer">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:ioMapping>
+          <zeebe:input source="=[pdfResult.mergedDocument]" target="Documents" />
+        </zeebe:ioMapping>
+        <zeebe:formDefinition formId="Form_thsomhc" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1mohb97</bpmn:incoming>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1xkwj18" sourceRef="StartEvent_1" targetRef="Activity_1pbbxny" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_08wy8uu">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="150" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_115mf1d_di" bpmnElement="Activity_1pbbxny">
+        <dc:Bounds x="230" y="78" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1j5e7pr_di" bpmnElement="Activity_0fmzi5o">
+        <dc:Bounds x="380" y="78" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1on46bo_di" bpmnElement="Activity_01tbwr5">
+        <dc:Bounds x="520" y="78" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_055maaz_di" bpmnElement="Flow_055maaz">
+        <di:waypoint x="330" y="118" />
+        <di:waypoint x="380" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mohb97_di" bpmnElement="Flow_1mohb97">
+        <di:waypoint x="480" y="118" />
+        <di:waypoint x="520" y="118" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1xkwj18_di" bpmnElement="Flow_1xkwj18">
+        <di:waypoint x="186" y="118" />
+        <di:waypoint x="230" y="118" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

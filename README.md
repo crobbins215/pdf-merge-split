@@ -12,14 +12,11 @@ In many IDP (Intelligent Document Processing) scenarios, users deal with scanned
 
 ### Features
 
-**Must Have:**
 - ✅ Split PDFs by page (individual pages or N pages per file)
 - ✅ Split PDFs by page ranges (e.g., "1-3,5-7,10-15")
-- ✅ Merge multiple PDF files into a single document
-
-**Nice to Have:**
 - ✅ Split PDFs by bookmarks (top-level bookmarks only)
 - ✅ Split PDFs by file size (iteratively adds pages until size limit)
+- ✅ Merge multiple PDF files into a single document
 
 ## Implementation Details
 
@@ -168,6 +165,18 @@ Splits a PDF into multiple files based on target file size. Pages are added iter
 | PDF_SPLIT_ERROR | Failed to split PDF document |
 | NO_BOOKMARKS | PDF document does not contain bookmarks |
 | INVALID_PAGE_RANGE | Invalid page range specification |
+
+## Example Processes
+
+To help you get started quickly, we've included ready-to-use BPMN process examples in the [`examples/`](examples/) directory:
+
+- **[PDF Merge.bpmn](examples/PDF%20Merge.bpmn)** - Complete workflow demonstrating how to merge multiple PDFs
+- **[PDF Split by Page.bpmn](examples/PDF%20Split%20by%20Page.bpmn)** - Process showing how to split a PDF into individual pages
+- **[PDF Upload.form](examples/PDF%20Upload.form)** - User form for uploading PDF files
+- **[PDF Viewer.form](examples/PDF%20Viewer.form)** - Form for viewing split PDF results
+- **[PDF Merge Viewer.form](examples/PDF%20Merge%20Viewer.form)** - Form for previewing merged PDF documents
+
+These examples can be imported directly into Camunda Web Modeler or Desktop Modeler and deployed to your Camunda cluster.
 
 ## Test locally
 
@@ -330,6 +339,25 @@ The generation is embedded in the Maven build and can be triggered by running `m
 The generated element template can be found in [element-templates/pdf-connector.json](./element-templates/pdf-connector.json).
 
 ## Release Notes
+
+**Version 1.3.0**
+
+Changes:
+- ✅ **Comprehensive test coverage expansion** - Test suite increased from 14 to 33 tests (135% increase)
+- ✅ **Error handling tests** - Added 11 tests covering corrupted PDFs, invalid ranges, boundary conditions
+- ✅ **Performance validation** - Added 8 load tests validating large file handling (up to 500 pages)
+- ✅ **Code coverage enforcement** - JaCoCo plugin configured with 80% instruction and 75% branch coverage thresholds
+- ✅ **Integration test framework** - Full Camunda runtime integration test created (disabled by default for CI speed)
+- ✅ **CI/CD improvements** - GitHub Actions workflow added for automated build and test verification
+- ✅ **Community contribution guide** - CONTRIBUTING.md added with development standards and guidelines
+
+**Version 1.2.0**
+
+Changes:
+- ✅ Simplified merge operation (removed page size standardization and bookmark preservation)
+- ✅ Reduced API complexity for better reliability
+- ✅ Comprehensive test coverage added (14 unit tests)
+- ✅ Version synchronized with GitHub releases
 
 **Version 1.1.0**
 

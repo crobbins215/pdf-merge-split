@@ -1,0 +1,27 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Web Modeler",
+    "version": "d6fa432"
+  },
+  "schemaVersion": 19,
+  "id": "Form_1ndaxvv",
+  "components": [
+    {
+      "label": "File picker",
+      "type": "filepicker",
+      "layout": {
+        "row": "Row_13d27of",
+        "columns": null
+      },
+      "id": "Field_0yy1lmq",
+      "key": "pdf",
+      "multiple": true,
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default"
+}

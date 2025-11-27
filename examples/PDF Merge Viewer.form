@@ -1,0 +1,23 @@
+{
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": {
+    "name": "Camunda Web Modeler",
+    "version": "328abc1"
+  },
+  "schemaVersion": 19,
+  "id": "Form_thsomhc",
+  "components": [
+    {
+      "label": "Document preview",
+      "type": "documentPreview",
+      "layout": {
+        "row": "Row_05ajcm3",
+        "columns": null
+      },
+      "id": "Field_06uhlko",
+      "dataSource": "=Documents"
+    }
+  ],
+  "type": "default"
+}
