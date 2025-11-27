@@ -1,3 +1,13 @@
+## Full-history secret scan
+
+Run a one-off scan of the entire Git history to check for past secrets:
+
+- Actions: open `Secret Scan (Full History)` → `Run workflow`.
+- Option: set `includeForks` to `true` to include merges from forks.
+- Outputs: redacted JSON uploaded as artifact `gitleaks-history-report`.
+- Tracking: an issue `Gitleaks full-history scan findings` is opened/updated with a summary and run link.
+- If any true positives are found, rotate credentials and close the issue when done.
+
 # PDF Merge & Split Connector
 
 A Camunda Outbound Connector for PDF document manipulation, providing split and merge operations for workflow automation.
