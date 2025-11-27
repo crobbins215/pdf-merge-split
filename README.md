@@ -1,20 +1,3 @@
-## Security & Compliance
-
-- Secret scanning: Gitleaks runs on every push/PR via `.github/workflows/gitleaks.yml` using `.gitleaks.toml`.
-- One-off history scan: trigger `Secret Scan (Full History)` from Actions to scan entire Git history.
-- Dependencies: Dependabot alerts are monitored; see the Security tab for current status.
-- Reporting: Please follow the guidance in [`SECURITY.md`](SECURITY.md) and use GitHub private reporting for vulnerabilities.
-
-### Run full-history secret scan
-
-Run a one-off scan of the entire Git history to check for past secrets:
-
-- Actions: open `Secret Scan (Full History)` → `Run workflow`.
-- Option: set `includeForks` to `true` to include merges from forks.
-- Outputs: redacted JSON uploaded as artifact `gitleaks-history-report`.
-- Tracking: an issue `Gitleaks full-history scan findings` is opened/updated with a summary and run link.
-- If any true positives are found, rotate credentials and close the issue when done.
-
 # PDF Merge & Split Connector
 
 A Camunda Outbound Connector for PDF document manipulation, providing split and merge operations for workflow automation.
@@ -338,6 +321,11 @@ Additionally, a Gitleaks workflow runs on push/PR to scan for secrets using `.gi
 # Install (one-time); see https://github.com/gitleaks/gitleaks/releases
 gitleaks detect --config .gitleaks.toml --redact --verbose
 ```
+
+#### Full-history scan (optional)
+- In GitHub Actions, run `Secret Scan (Full History)` to scan the entire Git history.
+- The run uploads a redacted JSON report artifact and opens/updates an issue summarizing findings.
+- See [`SECURITY.md`](SECURITY.md) for reporting guidance.
 
 #### Prerequisites
 
