@@ -39,12 +39,12 @@ import org.slf4j.LoggerFactory;
  * <p><b>Technology:</b>
  * <ul>
  *   <li>Apache PDFBox 3.0.3 for PDF processing</li>
- *   <li>Camunda Connector SDK 8.8.2</li>
+ *   <li>Camunda Connector SDK 8.8.3</li>
  *   <li>Java 21</li>
  * </ul>
  * 
  * @author Camunda PDF Merge & Split Connector
- * @version 0.1.0-SNAPSHOT
+ * @version 1.3.0
  * @see PdfOperations
  * @see PdfConnectorRequest
  * @see PdfConnectorResult
@@ -67,13 +67,11 @@ public class PdfConnectorProvider implements OutboundConnectorProvider {
     /**
      * Merges multiple PDF documents into a single file.
      * 
-     * <p>This operation combines the provided PDF documents in order, with options for:
-     * <ul>
-     *   <li>Bookmark preservation with document name prefixes</li>
-     *   <li>Page size standardization (KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, A4)</li>
-     * </ul>
+     * <p>This operation combines the provided PDF documents in order, preserving the original
+     * page sizes and content of each document. The merge is performed using PDFBox's
+     * PDFMergerUtility for reliable content preservation.
      * 
-     * @param request The merge operation request containing documents and configuration
+     * @param request The merge operation request containing documents and output filename
      * @param context The outbound connector context for document factory access
      * @return MergeResult containing the merged document and statistics
      * @throws io.camunda.connector.api.error.ConnectorException if merge fails

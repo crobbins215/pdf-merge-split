@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  * 
  * <p><b>Key Features:</b>
  * <ul>
- *   <li>PDF merging with bookmark preservation and page size standardization</li>
+ *   <li>PDF merging with original page size preservation</li>
  *   <li>Page-based splitting (by count, range, bookmark, or size)</li>
  *   <li>Robust error handling with ConnectorException</li>
  *   <li>Memory-efficient streaming for document creation</li>

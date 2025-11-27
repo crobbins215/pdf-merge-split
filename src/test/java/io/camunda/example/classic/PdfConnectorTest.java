@@ -14,7 +14,6 @@ import io.camunda.connector.runtime.test.outbound.OutboundConnectorContextBuilde
 import io.camunda.dto.PdfConnectorRequest;
 import io.camunda.dto.PdfConnectorResult;
 import io.camunda.example.operations.PdfConnectorProvider;
-import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
