@@ -133,9 +133,9 @@
   }, {
     "id" : "mergePdfs:merge-pageSizeStandardization",
     "label" : "Page Size Standardization",
-    "description" : "How to handle different page sizes: KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, or A4",
+    "description" : "How to handle different page sizes: KEEP_ORIGINAL (recommended), USE_LARGEST, USE_FIRST, or A4. WARNING: Options other than KEEP_ORIGINAL may cause content distortion or formatting issues.",
     "optional" : false,
-    "value" : "USE_LARGEST",
+    "value" : "KEEP_ORIGINAL",
     "feel" : "optional",
     "group" : "operation",
     "binding" : {

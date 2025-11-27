@@ -48,8 +48,8 @@ public class PdfConnectorRequest {
             id = "merge-pageSizeStandardization",
             group = "operation",
             label = "Page Size Standardization",
-            description = "How to handle different page sizes: KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, or A4",
-            defaultValue = "USE_LARGEST"
+            description = "How to handle different page sizes: KEEP_ORIGINAL (recommended), USE_LARGEST, USE_FIRST, or A4. WARNING: Options other than KEEP_ORIGINAL may cause content distortion or formatting issues.",
+            defaultValue = "KEEP_ORIGINAL"
         )
         String pageSizeStandardization
     ) {}

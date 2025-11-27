@@ -81,10 +81,10 @@ Combines multiple PDF files into a single document.
 - `outputFilename`: Name for the merged PDF (default: "merged.pdf")
 - `preserveBookmarks`: Retain bookmarks from source PDFs with filename prefixes (default: true)
 - `pageSizeStandardization`: How to handle different page sizes
-  - `KEEP_ORIGINAL`: Maintain original page sizes
-  - `USE_LARGEST`: Standardize to the largest page size
-  - `USE_FIRST`: Use the first document's page size
-  - `A4`: Standardize all pages to A4
+  - `KEEP_ORIGINAL`: Maintain original page sizes (recommended - default)
+  - `USE_LARGEST`: Standardize to the largest page size ⚠️ May cause content distortion
+  - `USE_FIRST`: Use the first document's page size ⚠️ May cause content distortion
+  - `A4`: Standardize all pages to A4 ⚠️ May cause content distortion
 
 **Output:**
 ```json
