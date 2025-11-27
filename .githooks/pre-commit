@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Secret guard pre-commit hook
+# Scans staged changes for common secret patterns and blocks the commit if found.
+# Bypass with: git commit --no-verify
+
+# Skip if explicitly disabled
+if [ "$SKIP_SECRET_CHECK" = "1" ]; then
+  exit 0
+fi
+
+SECRETS_REGEX='(?i)(client[._-]?secret|password|api[._-]?key|x-api-key|bearer[[:space:]]+[A-Za-z0-9._-]{10,}|access[._-]?token|refresh[._-]?token|BEGIN[[:space:]]+(RSA|OPENSSH)[[:space:]]+PRIVATE[[:space:]]+KEY|BEGIN[[:space:]]+CERTIFICATE)'
+
+# Build diff of staged content only
+DIFF_OUTPUT=$(git diff --cached -U0 -a | sed 's/\r$//')
+
+# Allowlist common placeholders and templates
+ALLOW_FILTER='(<YOUR_CLIENT_SECRET>|<YOUR_CLIENT_ID>|application\.properties\.template|example|sample|dummy)'
+
+# Grep only added lines for secrets, exclude allowed patterns
+echo "$DIFF_OUTPUT" \
+  | grep -E '^\+' \
+  | grep -Ev "$ALLOW_FILTER" \
+  | grep -En "$SECRETS_REGEX" >/tmp/secret_hits.$$ 2>/dev/null
+
+if [ -s "/tmp/secret_hits.$$" ]; then
+  echo "\n[SECRET-GUARD] Potential secrets detected in staged changes:" >&2
+  cat /tmp/secret_hits.$$ >&2
+  echo "\nCommit blocked. Remove secrets or use placeholders (see application.properties.template)." >&2
+  echo "To bypass (not recommended): git commit --no-verify" >&2
+  rm -f /tmp/secret_hits.$$
+  exit 1
+fi
+
+rm -f /tmp/secret_hits.$$ 2>/dev/null || true
+exit 0

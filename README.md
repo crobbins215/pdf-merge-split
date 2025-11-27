@@ -300,6 +300,28 @@ the [Element Templates documentation](https://docs.camunda.io/docs/components/mo
 
 ### Docker Deployment
 
+## Security & Secret Scanning
+
+To keep this repository safe when testing locally and contributing:
+
+- `src/main/resources/application.properties` is ignored by git; use `application.properties.template` as a starting point and never commit real credentials.
+- A pre-commit hook is provided to block accidental secret commits.
+
+Enable the hook once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+You can temporarily bypass (not recommended) with `git commit --no-verify` or by setting `SKIP_SECRET_CHECK=1` in your environment.
+
+Additionally, a Gitleaks workflow runs on push/PR to scan for secrets using `.gitleaks.toml`. To run Gitleaks locally:
+
+```bash
+# Install (one-time); see https://github.com/gitleaks/gitleaks/releases
+gitleaks detect --config .gitleaks.toml --redact --verbose
+```
+
 #### Prerequisites
 
 - Docker and Docker Compose installed

@@ -1,0 +1,16 @@
+title = "pdf-merge-split gitleaks"
+
+[allowlist]
+description = "Allow placeholders, templates, and docs"
+regexes = [
+  "<YOUR_CLIENT_SECRET>",
+  "<YOUR_CLIENT_ID>",
+  "example\.com",
+  "(?i)dummy|sample|placeholder|test-only"
+]
+paths = [
+  "(?i).*application\.properties\.template$",
+  "(?i).*README\.md$",
+  "(?i).*SECURITY\.md$",
+  "(?i).*CONTRIBUTING\.md$"
+]
