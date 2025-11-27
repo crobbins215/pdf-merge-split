@@ -8,6 +8,10 @@ on:
         required: false
         default: "false"
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   scan-history:
     runs-on: ubuntu-latest
@@ -29,7 +33,6 @@ jobs:
         id: gitleaks
         continue-on-error: true
         run: |
-          # Build log opts
           LOG_OPTS="--all"
           if [ "${{ github.event.inputs.includeForks }}" = "true" ]; then
             LOG_OPTS="$LOG_OPTS --remotes=origin"
@@ -70,99 +73,6 @@ jobs:
                 `Notes:\n- Entries are redacted. Review and rotate credentials if any true positives.\n- Close this issue once addressed.`
               : 'Gitleaks found no issues in repository history.';
 
-            // Search for existing open issue
-            const issues = await github.rest.search.issuesAndPullRequests({
-              q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${title}"`
-            });
-            if (issues.data.items.length > 0) {
-              const issue = issues.data.items[0];
-              await github.rest.issues.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                body
-              });
-            } else {
-              await github.rest.issues.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title,
-                body
-              });
-            }
-name: Secret Scan (Full History)
-
-on:
-  workflow_dispatch:
-    inputs:
-      includeForks:
-        description: "Also scan merge commits from forks (if present)"
-        required: false
-        default: "false"
-
-jobs:
-  scan-history:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout full history
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Install Gitleaks
-        run: |
-          VERSION=8.18.4
-          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v${VERSION}/gitleaks_${VERSION}_linux_x64.tar.gz -o gitleaks.tgz
-          tar -xzf gitleaks.tgz gitleaks
-          sudo mv gitleaks /usr/local/bin/gitleaks
-          gitleaks version
-
-      - name: Run Gitleaks over full history
-        id: gitleaks
-        continue-on-error: true
-        run: |
-          # Build log opts
-          LOG_OPTS="--all"
-          if [ "${{ github.event.inputs.includeForks }}" = "true" ]; then
-            LOG_OPTS="$LOG_OPTS --remotes=origin"
-          fi
-          gitleaks detect \
-            --config .gitleaks.toml \
-            --redact \
-            --report-format json \
-            --report-path gitleaks-history.json \
-            --log-opts "$LOG_OPTS" \
-            --verbose
-
-      - name: Upload report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-history-report
-          path: gitleaks-history.json
-
-      - name: Open or update issue on findings
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const path = 'gitleaks-history.json';
-            let findings = [];
-            if (fs.existsSync(path) && fs.statSync(path).size > 2) {
-              try { findings = JSON.parse(fs.readFileSync(path,'utf8')); } catch(e) { findings = []; }
-            }
-            const count = Array.isArray(findings) ? findings.length : (findings?.findings?.length || 0);
-            const title = 'Gitleaks full-history scan findings';
-            const body = count > 0
-              ? `Gitleaks detected ${count} potential finding(s) in repository history.\n\n` +
-                `- Workflow: ${process.env.GITHUB_WORKFLOW}\n` +
-                `- Run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}\n` +
-                `- Report: Download artifact 'gitleaks-history-report'\n\n` +
-                `Notes:\n- Entries are redacted. Review and rotate credentials if any true positives.\n- Close this issue once addressed.`
-              : 'Gitleaks found no issues in repository history.';
-
-            // Search for existing open issue
             const issues = await github.rest.search.issuesAndPullRequests({
               q: `repo:${context.repo.owner}/${context.repo.repo} is:issue is:open "${title}"`
             });
