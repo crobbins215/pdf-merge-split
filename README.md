@@ -20,8 +20,6 @@ In many IDP (Intelligent Document Processing) scenarios, users deal with scanned
 **Nice to Have:**
 - ✅ Split PDFs by bookmarks (top-level bookmarks only)
 - ✅ Split PDFs by file size (iteratively adds pages until size limit)
-- ✅ Bookmark preservation during merge (with document name prefixes)
-- ✅ Page size standardization during merge (KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, A4)
 
 ## Implementation Details
 
@@ -79,12 +77,6 @@ Combines multiple PDF files into a single document.
 **Input:**
 - `documents`: List of PDF documents to merge (in order)
 - `outputFilename`: Name for the merged PDF (default: "merged.pdf")
-- `preserveBookmarks`: Retain bookmarks from source PDFs with filename prefixes (default: true)
-- `pageSizeStandardization`: How to handle different page sizes
-  - `KEEP_ORIGINAL`: Maintain original page sizes (recommended - default)
-  - `USE_LARGEST`: Standardize to the largest page size ⚠️ May cause content distortion
-  - `USE_FIRST`: Use the first document's page size ⚠️ May cause content distortion
-  - `A4`: Standardize all pages to A4 ⚠️ May cause content distortion
 
 **Output:**
 ```json
@@ -339,11 +331,12 @@ The generated element template can be found in [element-templates/pdf-connector.
 
 ## Release Notes
 
-**Version 0.1.0-SNAPSHOT**
+**Version 1.1.0**
 
 New Features:
-- ✅ Added support for splitting PDFs by page, range, or bookmark
-- ✅ Added support for splitting PDFs by file size
-- ✅ Added support for merging multiple PDF files into a single document
-- ✅ Bookmark preservation during merge with document name prefixes
-- ✅ Page size standardization options during merge (KEEP_ORIGINAL, USE_LARGEST, USE_FIRST, A4)
+- ✅ Split PDFs by page, range, or bookmark
+- ✅ Split PDFs by file size
+- ✅ Merge multiple PDF files into a single document
+
+Bug Fixes:
+- ✅ Fixed content corruption when merging PDFs (now uses PDFMergerUtility)

@@ -12,7 +12,6 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.slf4j.Logger;
@@ -148,10 +147,6 @@ public class PdfOperations {
     ) {
         try {
             LOGGER.info("Merging {} PDF documents", merge.documents().size());
-            
-            boolean preserveBookmarks = merge.preserveBookmarks() != null && merge.preserveBookmarks();
-            String sizeStandard = merge.pageSizeStandardization() != null ? 
-                merge.pageSizeStandardization() : "KEEP_ORIGINAL";
 
             // Use PDFMergerUtility for proper resource handling
             PDFMergerUtility merger = new PDFMergerUtility();
@@ -180,13 +175,6 @@ public class PdfOperations {
             merger.mergeDocuments(null);
 
             byte[] pdfBytes = outputStream.toByteArray();
-            
-            // If we need page size standardization or bookmark handling, reopen and modify
-            if (!sizeStandard.equals("KEEP_ORIGINAL") || preserveBookmarks) {
-                LOGGER.warn("Page size standardization and bookmark preservation require content transformation which may cause formatting issues. Using KEEP_ORIGINAL is recommended.");
-                // Note: We skip these features to avoid formatting issues
-                // They require complex content stream transformation
-            }
 
             Document mergedDocument = context.create(
                 DocumentCreationRequest.from(pdfBytes)
@@ -485,101 +473,6 @@ public class PdfOperations {
     }
 
     // Helper methods
-
-    private static PDRectangle determineTargetPageSize(List<Document> documents, String standard) {
-        if (standard.equals("A4")) {
-            return PDRectangle.A4;
-        }
-
-        try {
-            PDRectangle largestSize = null;
-            PDRectangle firstSize = null;
-            double maxArea = 0;
-
-            for (Document doc : documents) {
-                try (PDDocument pdf = Loader.loadPDF(doc.asByteArray())) {
-                    if (pdf.getNumberOfPages() > 0) {
-                        PDPage firstPage = pdf.getPage(0);
-                        PDRectangle pageSize = firstPage.getMediaBox();
-
-                        if (firstSize == null) {
-                            firstSize = pageSize;
-                        }
-
-                        double area = pageSize.getWidth() * pageSize.getHeight();
-                        if (area > maxArea) {
-                            maxArea = area;
-                            largestSize = pageSize;
-                        }
-                    }
-                }
-            }
-
-            return standard.equals("USE_FIRST") ? firstSize : largestSize;
-
-        } catch (IOException e) {
-            LOGGER.warn("Failed to determine page size, using A4", e);
-            return PDRectangle.A4;
-        }
-    }
-
-    private static void copyBookmarks(PDDocument source, PDDocument target, String prefix, int pageOffset) {
-        try {
-            PDDocumentOutline sourceOutline = source.getDocumentCatalog().getDocumentOutline();
-            if (sourceOutline == null) {
-                return;
-            }
-
-            PDDocumentOutline targetOutline = target.getDocumentCatalog().getDocumentOutline();
-            if (targetOutline == null) {
-                targetOutline = new PDDocumentOutline();
-                target.getDocumentCatalog().setDocumentOutline(targetOutline);
-            }
-
-            for (PDOutlineItem item : sourceOutline.children()) {
-                PDOutlineItem mapped = mapOutlineItem(item, source, target, pageOffset, prefix);
-                if (mapped != null) {
-                    targetOutline.addLast(mapped);
-                }
-            }
-
-        } catch (Exception e) {
-            LOGGER.warn("Failed to copy bookmarks from {}: {}", prefix, e.getMessage());
-        }
-    }
-
-    private static PDOutlineItem mapOutlineItem(PDOutlineItem item, PDDocument source, PDDocument target, int pageOffset, String prefix) {
-        try {
-            PDOutlineItem newItem = new PDOutlineItem();
-            String title = item.getTitle() != null ? item.getTitle() : "";
-            newItem.setTitle(prefix != null && !prefix.isEmpty() ? prefix + " - " + title : title);
-
-            Integer srcIndex = resolveBookmarkPageIndex(item, source);
-            if (srcIndex != null && srcIndex >= 0 && srcIndex < source.getNumberOfPages()) {
-                int targetIndex = pageOffset + srcIndex;
-                if (targetIndex >= 0 && targetIndex < target.getNumberOfPages()) {
-                    org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination dest =
-                        new org.apache.pdfbox.pdmodel.interactive.documentnavigation.destination.PDPageXYZDestination();
-                    dest.setPage(target.getPage(targetIndex));
-                    newItem.setDestination(dest);
-                }
-            }
-
-            // Recurse children
-            PDOutlineItem child = item.getFirstChild();
-            while (child != null) {
-                PDOutlineItem mappedChild = mapOutlineItem(child, source, target, pageOffset, prefix);
-                if (mappedChild != null) {
-                    newItem.addLast(mappedChild);
-                }
-                child = child.getNextSibling();
-            }
-            return newItem;
-        } catch (Exception e) {
-            LOGGER.warn("Failed to map outline item '{}': {}", item.getTitle(), e.getMessage());
-            return null;
-        }
-    }
 
     private static Integer resolveBookmarkPageIndex(PDOutlineItem item, PDDocument doc) {
         try {

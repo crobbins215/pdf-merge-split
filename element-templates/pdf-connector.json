@@ -112,45 +112,6 @@
     },
     "type" : "String"
   }, {
-    "id" : "mergePdfs:merge-preserveBookmarks",
-    "label" : "Preserve Bookmarks",
-    "description" : "Retain bookmarks from source PDFs with filename prefixes",
-    "optional" : false,
-    "feel" : "static",
-    "group" : "operation",
-    "binding" : {
-      "name" : "preserveBookmarks",
-      "type" : "zeebe:input"
-    },
-    "condition" : {
-      "allMatch" : [ {
-        "property" : "operation",
-        "equals" : "mergePdfs",
-        "type" : "simple"
-      } ]
-    },
-    "type" : "Boolean"
-  }, {
-    "id" : "mergePdfs:merge-pageSizeStandardization",
-    "label" : "Page Size Standardization",
-    "description" : "How to handle different page sizes: KEEP_ORIGINAL (recommended), USE_LARGEST, USE_FIRST, or A4. WARNING: Options other than KEEP_ORIGINAL may cause content distortion or formatting issues.",
-    "optional" : false,
-    "value" : "KEEP_ORIGINAL",
-    "feel" : "optional",
-    "group" : "operation",
-    "binding" : {
-      "name" : "pageSizeStandardization",
-      "type" : "zeebe:input"
-    },
-    "condition" : {
-      "allMatch" : [ {
-        "property" : "operation",
-        "equals" : "mergePdfs",
-        "type" : "simple"
-      } ]
-    },
-    "type" : "String"
-  }, {
     "id" : "splitByBookmark:splitByBookmark-document",
     "label" : "PDF Document",
     "description" : "The PDF document to split by bookmarks",
