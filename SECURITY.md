@@ -8,8 +8,6 @@ If you discover a security vulnerability in this connector, please report it by:
 2. Email the maintainers directly or use GitHub's private vulnerability reporting feature
 3. Include detailed information about the vulnerability and steps to reproduce
 
-## Known Security Incidents
-
 ## Best Practices for Credentials Management
 
 ### Using This Connector
