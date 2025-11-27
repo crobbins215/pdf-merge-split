@@ -1,4 +1,4 @@
-FROM camunda/connectors:8.8.2
+FROM camunda/connectors:8.8.3
 
 # Copy the connector JAR
 COPY target/pdf-merge-split-connector-1.3.0.jar /opt/app/

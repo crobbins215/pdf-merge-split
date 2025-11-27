@@ -16,6 +16,4 @@ jobs:
 
       - name: Run Gitleaks
         uses: gitleaks/gitleaks-action@v2
-        with:
-          config-path: .gitleaks.toml
-          args: --redact --verbose
+        # v2 auto-discovers .gitleaks.toml and produces SARIF/artifact
