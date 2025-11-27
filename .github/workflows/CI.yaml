@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
 
 jobs:
   test:
@@ -19,3 +20,18 @@ jobs:
           cache: 'maven'
       - name: Build Artifact
         run: mvn --batch-mode clean verify
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
+
+      - name: Upload JaCoCo HTML coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+          if-no-files-found: warn
