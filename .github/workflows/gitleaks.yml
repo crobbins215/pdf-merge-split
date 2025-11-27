@@ -1,4 +1,6 @@
 name: Secret Scan (Gitleaks)
+permissions:
+  contents: read
 
 on:
   push:
